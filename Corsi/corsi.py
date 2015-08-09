@@ -313,4 +313,3 @@ dataFile.close()
 # check if correct or no
 # write to file sequence, what was pressed - compare to what was presented
 # give feedback
-RT=core.Clock.getTime(trialClock)
