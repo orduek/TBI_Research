@@ -29,7 +29,7 @@ else:
 
 fileName = expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
-dataFile.write('nTrial,trialList,ans,press\n')
+dataFile.write('nTrial,trialList,ans,press,block\n')
 
 
 # make a functino that will get mouse click position
@@ -49,7 +49,9 @@ rect9=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.4,-0.4),fillCol
 rect10=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,-0.7),fillColor="Blue")
 rectList={'rect1':rect1,'rect2':rect2,'rect3':rect3,'rect4':rect4,'rect5':rect5,'rect6':rect6,'rect7':rect7,'rect8':rect8,'rect9':rect9,'rect10':rect10} #set dictionary of rectangles and their names to run trials
 # set nTrial as numerator of trials
-nTrial=range(1,17) # 16 trials
+block="f" # will say if forward or backwards
+nTrial=range(1,2) # 16 trials forward
+nTrialbk=range(1,17) # 16 trials backwards
 n=0 # numerator to use later to choose how many numbers of mouse clicks should be pressed.
 ans=5 # integet of 1=correct, 0=incorrect responses
 numerr=0 # numerator errors
@@ -113,6 +115,40 @@ def expTrial(nTrial):
     elif nTrial==16:
         trialList=('rect8','rect2','rect6','rect1','rect10','rect3','rect7','rect4','rect9')
     return trialList
+def expTrialBack(nTrialbk): # make trials of the backward part of Corsi task.
+    if nTrialbk==1:
+        trialListbk=('rect7','rect4')
+    elif nTrialbk==2:
+        trialListbk=('rect3','rect10')
+    elif nTrialbk==3:
+        trialListbk=('rect8','rect2','rect7')
+    elif nTrialbk==4:
+        trialListbk=('rect1','rect9','rect3')
+    elif nTrialbk==5:
+        trialListbk=('rect10','rect6','rect2','rect7')
+    elif nTrialbk==6:
+        trialListbk=('rect4','rect9','rect1','rect6')
+    elif nTrialbk==7:
+        trialListbk=('rect5','rect7','rect9','rect8','rect2')
+    elif nTrialbk==8:
+        trialListbk=('rect6','rect5','rect1','rect4','rect8')
+    elif nTrialbk==9:
+        trialListbk=('rect9','rect2','rect6','rect7','rect3','rect5')
+    elif nTrialbk==10:
+        trialListbk=('rect4','rect1','rect9','rect3','rect8','rect10')
+    elif nTrialbk==11:
+        trialListbk=('rect2','rect6','rect3','rect8','rect2','rect10','rect1')
+    elif nTrialbk==12:
+        trialListbk=('rect10','rect1','rect6','rect4','rect8','rect5','rect7')
+    elif nTrialbk==13:
+        trialListbk=('rect6','rect9','rect3','rect2','rect1','rect7','rect10','rect5')
+    elif nTrialbk==14:
+        trialListbk=('rect7','rect3','rect10','rect5','rect7','rect8','rect4','rect9')
+    elif nTrialbk==15:
+        trialListbk=('rect8','rect2','rect6','rect1','rect10', 'rect3', 'rect7','rect4','rect9')
+    elif nTrialbk==16:
+        trialListbk=('rect5','rect8','rect4','rect10','rect7','rect3','rect1','rect9','rect6')
+    return trialListbk
 def changeColor (rect,color):
     rect.setFillColor(color=color)
     return rect
@@ -185,6 +221,7 @@ buildRect()
 mywin.flip(clearBuffer=True)
 
 for i in nTrial:
+    block="forward"
     trialList=expTrial(i)
     for x in trialList: # run a loop inside the
         #mark rec
@@ -207,7 +244,7 @@ for i in nTrial:
         core.wait(0.5)
         unmarkRec(press)
         event.clearEvents()
-        dataFile.write('%i,%s,%i,%s\n' %(i,n,ans,rectprs))
+        dataFile.write('%i,%s,%i,%s,%s\n' %(i,n,ans,rectprs,block))
         if numerr>0: # Defining trial as error.
             trialErr=1
         else:
@@ -217,7 +254,51 @@ for i in nTrial:
     else:
         errAmount=0
     if errAmount>2: # choose how many error in a raw, before stopping experiment.
-        core.quit()
+        break
+    else:
+        None
+# Finished the forward stage.
+# Show a msg that moving to different stage
+msg = visual.TextStim(mywin, pos=[0,0],text="Now backward",color="Black")
+msg.draw()
+mywin.flip()
+core.wait(3) # wait for 3sec (can be changed to waitforkeys)
+
+for i in nTrialbk:
+    block="backwards"
+    trialListbk=expTrialBack(i)
+    for x in trialListbk: # run a loop inside the
+        #mark rec
+        rect=rectList[x]
+        markRec(rect)
+        core.wait(1)
+        #unmark rec
+        unmarkRec(rect)
+    for n in reversed(trialListbk):  # now reversing the order to check for errors
+
+        press, rectprs  = checkMouse()
+
+        if press==rectList[n]:  # checking for errros and counting errors in trial.
+            ans=1
+            numerr=numerr
+        else:
+            ans=0
+            numerr=numerr+1
+        markRec(press)
+        core.wait(0.5)
+        unmarkRec(press)
+        event.clearEvents()
+        dataFile.write('%i,%s,%i,%s,%s\n' %(i,n,ans,rectprs,block))
+        if numerr>0: # Defining trial as error.
+            trialErr=1
+        else:
+            trialErr=0
+    if trialErr==1:
+        errAmount=errAmount+1
+    else:
+        errAmount=0
+    if errAmount>2: # choose how many error in a raw, before stopping experiment.
+        break
     else:
         None
 dataFile.close()
