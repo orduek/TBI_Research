@@ -52,7 +52,9 @@ rectList={'rect1':rect1,'rect2':rect2,'rect3':rect3,'rect4':rect4,'rect5':rect5,
 nTrial=range(1,17) # 16 trials
 n=0 # numerator to use later to choose how many numbers of mouse clicks should be pressed.
 ans=5 # integet of 1=correct, 0=incorrect responses
-numerr=0 # numerator to errors in a raw
+numerr=0 # numerator errors
+trialErr=0 # decide if trial is error or not
+errAmount=0 # counting how many error in trials
 # set positions of rectangles
 #positions=[(-0.8,0.8),(0.25,0.82),(0.8,0.5),(-0.1,0.3),(0.6,0.1),(-0.5,-0.2),(-0.82,-0.6),(-0.2,-0.7),(0.4,-0.4),(0.8,-0.7)]
 # set the filler rectangle
@@ -195,9 +197,9 @@ for i in nTrial:
 
         press, rectprs  = checkMouse()
 
-        if press==rectList[n]:
+        if press==rectList[n]:  # checking for errros and counting errors in trial.
             ans=1
-            numerr=0
+            numerr=numerr
         else:
             ans=0
             numerr=numerr+1
@@ -206,11 +208,18 @@ for i in nTrial:
         unmarkRec(press)
         event.clearEvents()
         dataFile.write('%i,%s,%i,%s\n' %(i,n,ans,rectprs))
-        if numerr>2: # choose number of raw errors before stops experiment
-            core.quit()
+        if numerr>0: # Defining trial as error.
+            trialErr=1
         else:
-            None
-
+            trialErr=0
+    if trialErr==1:
+        errAmount=errAmount+1
+    else:
+        errAmount=0
+    if errAmount>2: # choose how many error in a raw, before stopping experiment.
+        core.quit()
+    else:
+        None
 dataFile.close()
 
 # open window
