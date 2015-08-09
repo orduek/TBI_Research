@@ -29,7 +29,7 @@ else:
 
 fileName = expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
-dataFile.write('nTrial,trialList,ans,press,block\n')
+dataFile.write('nTrial,trialList,ans,press,block,rt\n')
 
 
 # make a functino that will get mouse click position
@@ -50,7 +50,7 @@ rect10=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,-0.7),fillCo
 rectList={'rect1':rect1,'rect2':rect2,'rect3':rect3,'rect4':rect4,'rect5':rect5,'rect6':rect6,'rect7':rect7,'rect8':rect8,'rect9':rect9,'rect10':rect10} #set dictionary of rectangles and their names to run trials
 # set nTrial as numerator of trials
 block="f" # will say if forward or backwards
-nTrial=range(1,2) # 16 trials forward
+nTrial=range(1,17) # 16 trials forward
 nTrialbk=range(1,17) # 16 trials backwards
 n=0 # numerator to use later to choose how many numbers of mouse clicks should be pressed.
 ans=5 # integet of 1=correct, 0=incorrect responses
@@ -231,9 +231,9 @@ for i in nTrial:
         #unmark rec
         unmarkRec(rect)
     for n in trialList:
-
+        trialClock=core.Clock() # open clock to measure reaction time
         press, rectprs  = checkMouse()
-
+        RT=core.Clock.getTime(trialClock) # meaure reaction time
         if press==rectList[n]:  # checking for errros and counting errors in trial.
             ans=1
             numerr=numerr
@@ -275,9 +275,9 @@ for i in nTrialbk:
         #unmark rec
         unmarkRec(rect)
     for n in reversed(trialListbk):  # now reversing the order to check for errors
-
+        trialClock=core.Clock()
         press, rectprs  = checkMouse()
-
+        RT=core.Clock.getTime(trialClock)
         if press==rectList[n]:  # checking for errros and counting errors in trial.
             ans=1
             numerr=numerr
@@ -288,7 +288,7 @@ for i in nTrialbk:
         core.wait(0.5)
         unmarkRec(press)
         event.clearEvents()
-        dataFile.write('%i,%s,%i,%s,%s\n' %(i,n,ans,rectprs,block))
+        dataFile.write('%i,%s,%i,%s,%s,%f\n' %(i,n,ans,rectprs,block,RT))
         if numerr>0: # Defining trial as error.
             trialErr=1
         else:
@@ -313,3 +313,4 @@ dataFile.close()
 # check if correct or no
 # write to file sequence, what was pressed - compare to what was presented
 # give feedback
+RT=core.Clock.getTime(trialClock)
