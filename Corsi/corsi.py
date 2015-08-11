@@ -29,7 +29,7 @@ else:
 
 fileName = expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
-dataFile.write('nTrial,trialList,ans,press,block,rt\n')
+dataFile.write('nTrial,trialList,ans,press,block,rt,length\n')
 
 
 # make a functino that will get mouse click position
@@ -57,6 +57,7 @@ ans=5 # integet of 1=correct, 0=incorrect responses
 numerr=0 # numerator errors
 trialErr=0 # decide if trial is error or not
 errAmount=0 # counting how many error in trials
+length=0
 # set positions of rectangles
 #positions=[(-0.8,0.8),(0.25,0.82),(0.8,0.5),(-0.1,0.3),(0.6,0.1),(-0.5,-0.2),(-0.82,-0.6),(-0.2,-0.7),(0.4,-0.4),(0.8,-0.7)]
 # set the filler rectangle
@@ -225,6 +226,7 @@ for i in nTrial:
     trialList=expTrial(i)
     for x in trialList: # run a loop inside the
         #mark rec
+        length=len(trialList)
         rect=rectList[x]
         markRec(rect)
         core.wait(1)
@@ -244,11 +246,12 @@ for i in nTrial:
         core.wait(0.5)
         unmarkRec(press)
         event.clearEvents()
-        dataFile.write('%i,%s,%i,%s,%s\n' %(i,n,ans,rectprs,block))
+        dataFile.write('%i,%s,%i,%s,%s,%f,%i\n' %(i,n,ans,rectprs,block,RT,length))
         if numerr>0: # Defining trial as error.
             trialErr=1
         else:
             trialErr=0
+    numerr=0
     if trialErr==1:
         errAmount=errAmount+1
     else:
@@ -257,18 +260,22 @@ for i in nTrial:
         break
     else:
         None
+    core.wait(1)
 # Finished the forward stage.
 # Show a msg that moving to different stage
 msg = visual.TextStim(mywin, pos=[0,0],text="Now backward",color="Black")
 msg.draw()
 mywin.flip()
 core.wait(3) # wait for 3sec (can be changed to waitforkeys)
+errAmount=0 # back to zero
+numerr=0
 
 for i in nTrialbk:
     block="backwards"
     trialListbk=expTrialBack(i)
     for x in trialListbk: # run a loop inside the
         #mark rec
+        length=len(trialListbk)
         rect=rectList[x]
         markRec(rect)
         core.wait(1)
@@ -288,11 +295,12 @@ for i in nTrialbk:
         core.wait(0.5)
         unmarkRec(press)
         event.clearEvents()
-        dataFile.write('%i,%s,%i,%s,%s,%f\n' %(i,n,ans,rectprs,block,RT))
+        dataFile.write('%i,%s,%i,%s,%s,%f,%i\n' %(i,n,ans,rectprs,block,RT,length))
         if numerr>0: # Defining trial as error.
             trialErr=1
         else:
             trialErr=0
+        numerr=0
     if trialErr==1:
         errAmount=errAmount+1
     else:
@@ -301,6 +309,7 @@ for i in nTrialbk:
         break
     else:
         None
+    core.wait(1)
 dataFile.close()
 
 # open window
