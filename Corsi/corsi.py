@@ -7,7 +7,7 @@ Corsi Block Expreiment in Psychopy.
 This experiment is spatial memory experiment as in the WMS
 """
 
-from psychopy import core, visual, gui, data, misc, event
+from psychopy import core, visual, gui, data, misc, event, sound
 import time, os
 # now turn to right folder
 directory=os.getcwd()  # get folder
@@ -26,6 +26,10 @@ if dlg.OK:
     misc.toFile('corsi.pickle', expInfo)#save params to file for next time
 else:
     core.quit()#the user hit cancel so exit
+
+# check if folder exist and if not, create it
+if not os.path.exists('results'):
+    os.makedirs('results')
 
 fileName = expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
@@ -48,6 +52,10 @@ rect8=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.2,-0.7),fillCo
 rect9=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.4,-0.4),fillColor="Blue")
 rect10=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,-0.7),fillColor="Blue")
 rectList={'rect1':rect1,'rect2':rect2,'rect3':rect3,'rect4':rect4,'rect5':rect5,'rect6':rect6,'rect7':rect7,'rect8':rect8,'rect9':rect9,'rect10':rect10} #set dictionary of rectangles and their names to run trials
+
+gosound=sound.Sound('A',octave=3, sampleRate=44100, secs=0.8, bits=8)
+
+
 # set nTrial as numerator of trials
 block="f" # will say if forward or backwards
 nTrial=range(1,17) # 16 trials forward
@@ -232,6 +240,7 @@ for i in nTrial:
         core.wait(1)
         #unmark rec
         unmarkRec(rect)
+    gosound.play()
     for n in trialList:
         trialClock=core.Clock() # open clock to measure reaction time
         press, rectprs  = checkMouse()
@@ -261,6 +270,7 @@ for i in nTrial:
     else:
         None
     core.wait(1)
+
 # Finished the forward stage.
 # Show a msg that moving to different stage
 msg = visual.TextStim(mywin, pos=[0,0],text="Now backward",color="Black")
@@ -281,6 +291,7 @@ for i in nTrialbk:
         core.wait(1)
         #unmark rec
         unmarkRec(rect)
+    gosound.play() # add sound at the end of presentation of trial
     for n in reversed(trialListbk):  # now reversing the order to check for errors
         trialClock=core.Clock()
         press, rectprs  = checkMouse()
@@ -300,7 +311,7 @@ for i in nTrialbk:
             trialErr=1
         else:
             trialErr=0
-        numerr=0
+    numerr=0
     if trialErr==1:
         errAmount=errAmount+1
     else:
