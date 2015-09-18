@@ -35,27 +35,27 @@ fileName = expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
 dataFile.write('nTrial,trialList,ans,press,block,rt,length\n')
 
-
+rectColor="DarkSlateBlue" # set retangle default color
 # make a functino that will get mouse click position
 
 # adjust sequence of presentation
-mywin = visual.Window(fullscr=False,monitor="testMonitor",allowGUI=False,rgb=[1,1,1])
+mywin = visual.Window(fullscr=True,monitor="testMonitor",allowGUI=False,color="Black") #rgb=[1,1,1])
 ### Build rectangles
-rect1=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.8,0.8),fillColor="Blue")
-rect2=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.25,0.82),fillColor="Blue")
-rect3=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,0.5),fillColor="Blue")
-rect4=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.1,0.3),fillColor="Blue")
-rect5=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.6,0.1),fillColor="Blue")
-rect6=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.5,-0.2),fillColor="Blue")
-rect7=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.82,-0.6),fillColor="Blue")
-rect8=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.2,-0.7),fillColor="Blue")
-rect9=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.4,-0.4),fillColor="Blue")
-rect10=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,-0.7),fillColor="Blue")
+rect1=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.8,0.8),fillColor=rectColor)
+rect2=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.25,0.82),fillColor=rectColor)
+rect3=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,0.5),fillColor=rectColor)
+rect4=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.1,0.3),fillColor=rectColor)
+rect5=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.6,0.1),fillColor=rectColor)
+rect6=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.5,-0.2),fillColor=rectColor)
+rect7=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.82,-0.6),fillColor=rectColor)
+rect8=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(-0.2,-0.7),fillColor=rectColor)
+rect9=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.4,-0.4),fillColor=rectColor)
+rect10=visual.Rect(mywin,width=0.3,height=0.3,units='norm',pos=(0.8,-0.7),fillColor=rectColor)
 rectList={'rect1':rect1,'rect2':rect2,'rect3':rect3,'rect4':rect4,'rect5':rect5,'rect6':rect6,'rect7':rect7,'rect8':rect8,'rect9':rect9,'rect10':rect10} #set dictionary of rectangles and their names to run trials
 
-gosound=sound.Sound('A',octave=3, sampleRate=44100, secs=0.8, bits=8)
+gosound=sound.Sound('A',octave=4, sampleRate=44100, secs=0.5, bits=8)
 
-
+msgReady = visual.TextStim(mywin, pos=[0,0],text="Ready?",color="White")
 # set nTrial as numerator of trials
 block="f" # will say if forward or backwards
 nTrial=range(1,17) # 16 trials forward
@@ -232,16 +232,23 @@ mywin.flip(clearBuffer=True)
 for i in nTrial:
     block="forward"
     trialList=expTrial(i)
+    msgReady.draw()
+    buildRect()
+    mywin.flip()
+    core.wait(1)
     for x in trialList: # run a loop inside the
+        # get ready
         #mark rec
+        myMouse.setVisible(0) # mouse pointer disappears
         length=len(trialList)
         rect=rectList[x]
         markRec(rect)
         core.wait(1)
         #unmark rec
         unmarkRec(rect)
-    gosound.play()
+    #gosound.play()
     for n in trialList:
+        myMouse.setVisible(1) # mouse pointer appears again
         trialClock=core.Clock() # open clock to measure reaction time
         press, rectprs  = checkMouse()
         RT=core.Clock.getTime(trialClock) # meaure reaction time
@@ -251,6 +258,7 @@ for i in nTrial:
         else:
             ans=0
             numerr=numerr+1
+        myMouse.setVisible(0)
         markRec(press)
         core.wait(0.5)
         unmarkRec(press)
@@ -283,7 +291,12 @@ numerr=0
 for i in nTrialbk:
     block="backwards"
     trialListbk=expTrialBack(i)
+    msgReady.draw()
+    buildRect()
+    mywin.flip()
+    core.wait(1)
     for x in trialListbk: # run a loop inside the
+        myMouse.setVisible(0) # mouse pointer disappears
         #mark rec
         length=len(trialListbk)
         rect=rectList[x]
@@ -291,8 +304,9 @@ for i in nTrialbk:
         core.wait(1)
         #unmark rec
         unmarkRec(rect)
-    gosound.play() # add sound at the end of presentation of trial
+   # gosound.play() # add sound at the end of presentation of trial
     for n in reversed(trialListbk):  # now reversing the order to check for errors
+        myMouse.setVisible(1) # mouse pointer reappears
         trialClock=core.Clock()
         press, rectprs  = checkMouse()
         RT=core.Clock.getTime(trialClock)
