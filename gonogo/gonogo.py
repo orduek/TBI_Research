@@ -70,78 +70,78 @@ age=float(expInfo['Age'])
 if age<=5:
     stimExp=2# stimulus exposure - should be changed with age (according to associated doc)
     maxTime=3 # maximum time for keypress
-elif 5<age <=9:
+elif 5<age <=10:
     stimExp=1
     maxTime=1
-else:
+elif age>10:
     stimExp=0.5
     maxTime=1
 
 trialNo=0 # setting counter of trials
 
 
-def training (stim1):
-    x=20 # position of mouse
-    if stim1==redapple:
-        timeOfExp=core.CountdownTimer(stimExp)
-        while timeOfExp.getTime()>0:
-            press=0 # setting if pressed or not in order to show bad feedback
-            x=x-0.5 # moving the mouse acros screen
-            if x<-21:
-                x=20
-            else:
-                x=x
-            mywin.flip()
-            stim1.pos=(x,0)
-            stim1.draw()
-            allKeys=event.getKeys()
-            for thisKey in allKeys:
-                if thisKey=='space':
-                    press=1
-                    basket.pos=(x,0)
-                    stim1.draw()
-                    basket.draw()
-                    mywin.flip()
-                    core.wait(1)
-                    goodFeedback.draw()
-                    mywin.flip()
-                    core.wait(1)
-                    timeOfExp=core.CountdownTimer(0)
-        if press==0:
-            mywin.flip()
-            #badFeedback.draw()
-            mywin.flip()
-            core.wait(1)
-    else:
-        press=0
-        timeOfExp=core.CountdownTimer(stimExp)
-        while timeOfExp.getTime()>0:
-            x=x-0.5 # moving the mouse acros screen
-            if x<-21:
-                x=20
-            else:
-                x=x
-            mywin.flip()
-            stim1.pos=(x,0)
-            stim1.draw()
-            allKeys=event.getKeys()
-            for thisKey in allKeys:
-                if thisKey=='space':
-                    press=1
-                    basket.pos=(x,0)
-                    stim1.draw()
-                    basket.draw()
-                    mywin.flip()
-                    core.wait(1)
-                    #badFeedback.draw()
-                    mywin.flip()
-                    core.wait(1)
-                    timeOfExp=core.CountdownTimer(0)
-        if press==0:
-            mywin.flip()  # clear all
-            goodFeedback.draw()
-            mywin.flip()
-            core.wait(1)
+# def training (stim1):
+#     x=20 # position of mouse
+#     if stim1==redapple:
+#         timeOfExp=core.CountdownTimer(stimExp)
+#         while timeOfExp.getTime()>0:
+#             press=0 # setting if pressed or not in order to show bad feedback
+#             x=x-0.5 # moving the mouse acros screen
+#             if x<-21:
+#                 x=20
+#             else:
+#                 x=x
+#             mywin.flip()
+#             stim1.pos=(x,0)
+#             stim1.draw()
+#             allKeys=event.getKeys()
+#             for thisKey in allKeys:
+#                 if thisKey=='space':
+#                     press=1
+#                     basket.pos=(x,0)
+#                     stim1.draw()
+#                     basket.draw()
+#                     mywin.flip()
+#                     core.wait(1)
+#                     goodFeedback.draw()
+#                     mywin.flip()
+#                     core.wait(1)
+#                     timeOfExp=core.CountdownTimer(0)
+#         if press==0:
+#             mywin.flip()
+#             #badFeedback.draw()
+#             mywin.flip()
+#             core.wait(1)
+#     else:
+#         press=0
+#         timeOfExp=core.CountdownTimer(stimExp)
+#         while timeOfExp.getTime()>0:
+#             x=x-0.5 # moving the mouse acros screen
+#             if x<-21:
+#                 x=20
+#             else:
+#                 x=x
+#             mywin.flip()
+#             stim1.pos=(x,0)
+#             stim1.draw()
+#             allKeys=event.getKeys()
+#             for thisKey in allKeys:
+#                 if thisKey=='space':
+#                     press=1
+#                     basket.pos=(x,0)
+#                     stim1.draw()
+#                     basket.draw()
+#                     mywin.flip()
+#                     core.wait(1)
+#                     #badFeedback.draw()
+#                     mywin.flip()
+#                     core.wait(1)
+#                     timeOfExp=core.CountdownTimer(0)
+#         if press==0:
+#             mywin.flip()  # clear all
+#             goodFeedback.draw()
+#             mywin.flip()
+#             core.wait(1)
 def showTrial(stim1):
     press=0
     x=20 # position of mouse
@@ -251,11 +251,33 @@ def showTrial(stim1):
     return (trial, RT, press, answer)
 # train 1
 def trainsession(): # need to fix training function (maybe combine with showTrial)
-    training(redapple)
-    training(greenapple)
-    training(redapple)
+    trial,RT,press,answer = showTrial(redapple)
+    if answer==1:
+        goodFeedback.draw()
+        mywin.flip()
+        core.wait(1)
+    else:
+        mywin.flip()
+        core.wait(1)
+    trial,RT,press,answer = showTrial(greenapple)
+    if answer==1:
+        goodFeedback.draw()
+        mywin.flip()
+        core.wait(1)
+    else:
+        mywin.flip()
+        core.wait(1)
+    trial,RT,press,answer = showTrial(redapple)
+    if answer==1:
+        goodFeedback.draw()
+        mywin.flip()
+        core.wait(1)
+    else:
+        mywin.flip()
+        core.wait(1)
 press=0
 while press==0:
+    trialClock=core.Clock()
     trainsession()
     mywin.flip()
     cont.draw()
@@ -276,10 +298,10 @@ def buildList(age):
     if age<=5:
         x=x*12 # total 24 go
         y=y*4 # total 8 no go
-    elif 5>age <=9:
+    elif 5>age <=10:
         x=x*30
         y=y*10
-    elif 9> age <=20:
+    elif age >10:
         x=x*45
         y=y*15
     ageLst=x+y
