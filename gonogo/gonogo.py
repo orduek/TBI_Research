@@ -51,14 +51,16 @@ mywin = visual.Window(fullscr=True,monitor="testMonitor",allowGUI=False,color="W
 # then- acording to age - divide conditions (in accordance with attached doc file.)
 # build stumuli
 fixation = visual.GratingStim(win=mywin, size=0.5, pos=[0,0], sf=0, rgb=-1)
-redapple=visual.ImageStim(mywin,image='redapple.jpg',units='deg',pos=(0,0),size=8)
-greenapple=visual.ImageStim(mywin,image='greenapple.jpg',units='deg',pos=(0,0),size=8)
-basket=visual.ImageStim(mywin,image='applebasket.png',units='deg',pos=(-10,-4),size=15)
+redapple=visual.ImageStim(mywin,image='redapple.jpg',units='deg',pos=(0,0),size=6)
+greenapple=visual.ImageStim(mywin,image='greenapple.jpg',units='deg',pos=(0,0),size=6)
+basket=visual.ImageStim(mywin,image='applebasket.png',units='deg',pos=(-10,-4),size=12)
 goodFeedback=visual.ImageStim(mywin, image="smiley.jpeg",units='deg',pos=(0,0),size=10)
 badFeedback=visual.ImageStim(mywin, image="sadsmiley.jpeg",units='deg',pos=(0,0),size=10)
 thanks=visual.ImageStim(mywin, image="thanks.png",units='deg', pos=(0,0),size=20)
 cont=visual.ImageStim(mywin, image="continue.png",units='deg', pos=(0,0),size=10)
 fixation = visual.GratingStim(mywin, color=-1, colorSpace='rgb', tex=None, mask='circle',size=0.01)
+# sound of clapping hands
+clapsound=sound.Sound(value='applause4.wav', secs=2)
 # the variables will be:
 # age
 # go number
@@ -67,7 +69,10 @@ fixation = visual.GratingStim(mywin, color=-1, colorSpace='rgb', tex=None, mask=
 # maximum time to react
 # intertrial intervals (1.5s in all for now)
 age=float(expInfo['Age'])
-if age<=5:
+if age==0:
+    stimExp=1
+    maxTime=1
+elif 0<age<=5:
     stimExp=2# stimulus exposure - should be changed with age (according to associated doc)
     maxTime=3 # maximum time for keypress
 elif 5<age <=10:
@@ -79,69 +84,6 @@ elif age>10:
 
 trialNo=0 # setting counter of trials
 
-
-# def training (stim1):
-#     x=20 # position of mouse
-#     if stim1==redapple:
-#         timeOfExp=core.CountdownTimer(stimExp)
-#         while timeOfExp.getTime()>0:
-#             press=0 # setting if pressed or not in order to show bad feedback
-#             x=x-0.5 # moving the mouse acros screen
-#             if x<-21:
-#                 x=20
-#             else:
-#                 x=x
-#             mywin.flip()
-#             stim1.pos=(x,0)
-#             stim1.draw()
-#             allKeys=event.getKeys()
-#             for thisKey in allKeys:
-#                 if thisKey=='space':
-#                     press=1
-#                     basket.pos=(x,0)
-#                     stim1.draw()
-#                     basket.draw()
-#                     mywin.flip()
-#                     core.wait(1)
-#                     goodFeedback.draw()
-#                     mywin.flip()
-#                     core.wait(1)
-#                     timeOfExp=core.CountdownTimer(0)
-#         if press==0:
-#             mywin.flip()
-#             #badFeedback.draw()
-#             mywin.flip()
-#             core.wait(1)
-#     else:
-#         press=0
-#         timeOfExp=core.CountdownTimer(stimExp)
-#         while timeOfExp.getTime()>0:
-#             x=x-0.5 # moving the mouse acros screen
-#             if x<-21:
-#                 x=20
-#             else:
-#                 x=x
-#             mywin.flip()
-#             stim1.pos=(x,0)
-#             stim1.draw()
-#             allKeys=event.getKeys()
-#             for thisKey in allKeys:
-#                 if thisKey=='space':
-#                     press=1
-#                     basket.pos=(x,0)
-#                     stim1.draw()
-#                     basket.draw()
-#                     mywin.flip()
-#                     core.wait(1)
-#                     #badFeedback.draw()
-#                     mywin.flip()
-#                     core.wait(1)
-#                     timeOfExp=core.CountdownTimer(0)
-#         if press==0:
-#             mywin.flip()  # clear all
-#             goodFeedback.draw()
-#             mywin.flip()
-#             core.wait(1)
 def showTrial(stim1):
     press=0
     x=20 # position of mouse
@@ -295,7 +237,10 @@ while press==0:
 def buildList(age):
     x=['go','go']
     y=['nogo','nogo']
-    if age<=5:
+    if age==0: # for testing
+        x=x
+        y=y
+    elif 0<age<=5:
         x=x*12 # total 24 go
         y=y*4 # total 8 no go
     elif 5>age <=10:
@@ -333,4 +278,5 @@ dataFile.close()
 core.wait(1)
 thanks.draw()
 mywin.flip()
-core.wait(1)
+clapsound.play()
+event.waitKeys()
