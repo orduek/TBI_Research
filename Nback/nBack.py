@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Created on Wed Sep  9 14:30:16 2015
@@ -62,6 +63,10 @@ distractorImage1=visual.ImageStim(mywin,image=animalList[2],units='deg',pos=(0,0
 distractorImage2=visual.ImageStim(mywin,image=animalList[3],units='deg',pos=(0,0),size=6)
 thanks=visual.ImageStim(mywin,image='thanks.png',units='deg',pos=(0,0),size=8)
 contin=visual.ImageStim(mywin,image='continue.png',units='deg',pos=(0,0))
+correctMsg=visual.TextStim(mywin, text="Right", color="green")
+incorrectMsg=visual.TextStim(mywin, text="Wrong", color="Red")
+slideOne=visual.ImageStim(mywin, image='slide1.png',units='deg',pos=(0,0))
+slideTwo=visual.ImageStim(mywin, image='endPractice.png',units='deg',pos=(0,0))
 # present stimulus for 1500ms
 # interstimulus interval of 1000ms
 
@@ -82,11 +87,11 @@ trialNo=0
 stimExp = 1.5 #1500ms exposure of stimulus
 
 
-def runBlock(n,block):
+def runBlock(n,block, targetList,distList): # take a target and distractor list to use same functions to practice trials
     global trialNo
     trialNo=trialNo
-    random.shuffle(targetList)
-    trialList=distList+targetList
+    random.shuffle(targetList) # shuffle just the last 22
+    trialList=distList+targetList # combine the first 3 distractors with last 22
     for i in trialList:
         trialCond=i
         trialClock=core.Clock()
@@ -101,10 +106,14 @@ def runBlock(n,block):
             distractorImage1.draw()
             mywin.flip()
             allKeys=event.waitKeys(maxWait=1.5,keyList=['space','escape'])
-            if allKeys==None:
+            if allKeys==None: # if no key was presses
                 response=0
                 answer=1
                 rt=core.Clock.getTime(trialClock)
+                correctMsg.draw()
+                mywin.flip()
+                core.wait(1)
+
             else:
                 response=1
                 for thisKey in allKeys:
@@ -113,9 +122,12 @@ def runBlock(n,block):
                     elif thisKey=='space':
                         answer=0
                         rt=core.Clock.getTime(trialClock)
+                        incorrectMsg.draw()
+                        mywin.flip()
+                        core.wait(1)
 
-            mywin.flip()
-            core.wait(1)
+            #mywin.flip()
+        #    core.wait(1)
             # save answers to file
         else:
 
@@ -130,6 +142,9 @@ def runBlock(n,block):
                 response=0
                 answer=0
                 rt=core.Clock.getTime(trialClock)
+                incorrectMsg.draw()
+                mywin.flip()
+                core.wait(1)
 
             else:
                 response=1
@@ -139,22 +154,46 @@ def runBlock(n,block):
                     elif thisKey=='space':
                         answer=1
                         rt=core.Clock.getTime(trialClock)
+                        correctMsg.draw()
+                        mywin.flip()
+                        core.wait(1)
 
-            mywin.flip()
-            core.wait(1)
+        #    mywin.flip()
+        #    core.wait(1)
             #save to file (trialNo,condition,image,press,RT,correct/incorrect)
         event.clearEvents()
         dataFile.write('%i,%i,%s,%f,%i,%i,%s\n' %(trialNo,block,trialCond,rt,response,answer,stimulus))
-# training block
+
+
+# Instructions slide 1
+slideOne.draw()
+mywin.flip()
+event.waitKeys()
+endP=0 # set practice loop
+while endP==0:
+    # training block -  14 samples
+    trainList= ['distractor'] *6 + ['target'] *7
+    trainListdist=['distractor']
+    runBlock(1,0,trainList,trainListdist) # training block, same length but only 1-back.
+    slideTwo.draw()
+    mywin.flip()
+    allKeys=event.waitKeys()
+    for thisKey in allKeys:
+        if thisKey=='escape':
+            core.quit()
+        elif thisKey=='space':
+            endP=1
+        elif thisKey=='r':
+            endP==0
 
 # 1-back block
-runBlock(1,1)
+runBlock(1,1,targetList,distList)
 contin.draw()
 mywin.flip()
 
 event.waitKeys()
 
-runBlock(2,2)
+runBlock(2,2,targetList,distList)
 thanks.draw()
 mywin.flip()
 core.wait(2)
