@@ -65,8 +65,9 @@ thanks=visual.ImageStim(mywin,image='thanks.png',units='deg',pos=(0,0),size=8)
 contin=visual.ImageStim(mywin,image='continue.png',units='deg',pos=(0,0))
 correctMsg=visual.TextStim(mywin, text="Right", color="green")
 incorrectMsg=visual.TextStim(mywin, text="Wrong", color="Red")
-slideOne=visual.ImageStim(mywin, image='slide1.png',units='deg',pos=(0,0))
-slideTwo=visual.ImageStim(mywin, image='endPractice.png',units='deg',pos=(0,0))
+slideOne=visual.ImageStim(mywin, image='slide1.png',units='deg',pos=(0,0),size=20)
+secondBlock=visual.ImageStim(mywin, image='secondBlock.png',units='deg',pos=(0,0),size=20)
+slideTwo=visual.ImageStim(mywin, image='endPractice.png',units='deg',pos=(0,0),size=10)
 # present stimulus for 1500ms
 # interstimulus interval of 1000ms
 
@@ -190,6 +191,28 @@ while endP==0:
 runBlock(1,1,targetList,distList)
 contin.draw()
 mywin.flip()
+
+
+# Instructions slide 1
+secondBlock.draw()
+mywin.flip()
+event.waitKeys()
+endP=0 # set practice loop
+while endP==0:
+    # training block -  14 samples
+    trainList= ['distractor'] *6 + ['target'] *7
+    trainListdist=['distractor']
+    runBlock(2,0,trainList,trainListdist) # training block, same length but only 1-back.
+    slideTwo.draw()
+    mywin.flip()
+    allKeys=event.waitKeys()
+    for thisKey in allKeys:
+        if thisKey=='escape':
+            core.quit()
+        elif thisKey=='space':
+            endP=1
+        elif thisKey=='r':
+            endP==0
 
 event.waitKeys()
 
