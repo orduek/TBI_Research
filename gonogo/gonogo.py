@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Created on Fri Sep 18 15:39:25 2015
@@ -16,6 +17,8 @@ GO/NoGo task. Based on Cat and Mouse game from article of Simpson & Riggs, 2005.
 
 from psychopy import core, visual, gui, data, misc, event, sound
 import time, os, random, numpy
+
+
 # now turn to right folder
 directory=os.getcwd()  # get folder
 os.chdir(directory) # use it
@@ -25,7 +28,7 @@ os.chdir(directory) # use it
 try:#try to get a previous parameters file
     expInfo = misc.fromFile('gonogo.pickle')
 except:#if not there then use a default set
-    expInfo = {'subject no':'','Age':''}
+    expInfo = {'subject no':'','age':''}
 expInfo['dateStr']= data.getDateStr() #add the current time
 # dialouge box for name of subject and file
 dlg = gui.DlgFromDict(expInfo, title='Go/NoGo Task', fixed=['dateStr'])
@@ -38,7 +41,7 @@ else:
 if not os.path.exists('results'):
     os.makedirs('results')
 
-fileName = expInfo['subject no'] + expInfo['dateStr']
+fileName = 'GonGo' + expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
 dataFile.write('trialNo,trial,RT,press,answer\n')
 
@@ -68,13 +71,13 @@ clapsound=sound.Sound(value='applause4.wav', secs=2)
 #stimulus exposure
 # maximum time to react
 # intertrial intervals (1.5s in all for now)
-age=float(expInfo['Age'])
+age=float(expInfo['age'])
 if age==0:
     stimExp=1
     maxTime=1
 elif 0<age<=5:
     stimExp=2# stimulus exposure - should be changed with age (according to associated doc)
-    maxTime=3 # maximum time for keypress
+    maxTime=2 # maximum time for keypress
 elif 5<age <=10:
     stimExp=1
     maxTime=1
