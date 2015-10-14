@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jul 30 11:01:15 2015
@@ -35,7 +36,7 @@ fileName = expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
 dataFile.write('nTrial,trialList,ans,press,block,rt,length\n')
 
-rectColor="DarkSlateBlue" # set retangle default color
+rectColor="Blue" # set retangle default color
 # make a functino that will get mouse click position
 
 # adjust sequence of presentation
@@ -159,12 +160,17 @@ def expTrialBack(nTrialbk): # make trials of the backward part of Corsi task.
         trialListbk=('rect5','rect8','rect4','rect10','rect7','rect3','rect1','rect9','rect6')
     return trialListbk
 def changeColor (rect,color):
-    rect.setFillColor(color=color)
-    return rect
+    if rect == 'norect': # adding the option of no rectangle pressed
+        None
+    else:
+        rect.setFillColor(color=color)
+        return rect
+
 def checkMouse():
     #a=[0,0,0] # setting buttons list
     #a=myMouse.getPressed()
-    while True:  # while left button wasn't pressed wait to press
+    timeOfExp=core.CountdownTimer(5.5) # stop waiting after five second without press
+    while timeOfExp.getTime()>0:  # while left button wasn't pressed wait to press
     #handle key presses each frame
         for key in event.getKeys():
             if key in ['escape','q']:
@@ -209,26 +215,39 @@ def checkMouse():
             press=rect10
             rectprs='rect10'
             break
+        elif timeOfExp.getTime()<0.5:
+            press='norect'
+            rectprs='none'
+            break
     #else:
     #    a[0]=0
     return press, rectprs
 
 def markRec(x):
-  buildRect()
-  changeColor(x,"yellow")
-  x.draw()
-  mywin.flip()
+    if x != 'norect':
+        buildRect()
+        changeColor(x,"yellow")
+        x.draw()
+        mywin.flip()
+    else:
+        None
 
 def unmarkRec(x):
-  changeColor(x,"Blue")
-  buildRect()
-  mywin.flip()
+    if x != 'norect':
+          changeColor(x,"Blue")
+          buildRect()
+          mywin.flip()
+    else:
+        None
 
 
-buildRect()
+#buildRect()
 #expTrial()
 mywin.flip(clearBuffer=True)
-
+msg = visual.TextStim(mywin, pos=[0,0],text="Forward",color="White")
+msg.draw()
+mywin.flip()
+core.wait(2)
 for i in nTrial:
     block="forward"
     trialList=expTrial(i)
@@ -281,7 +300,7 @@ for i in nTrial:
 
 # Finished the forward stage.
 # Show a msg that moving to different stage
-msg = visual.TextStim(mywin, pos=[0,0],text="Now backward",color="Black")
+msg = visual.TextStim(mywin, pos=[0,0],text="Now backward",color="White")
 msg.draw()
 mywin.flip()
 core.wait(3) # wait for 3sec (can be changed to waitforkeys)

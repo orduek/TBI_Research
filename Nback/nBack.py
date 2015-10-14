@@ -11,13 +11,6 @@ N-Back task - basis to use in TBI study (CreactKids)
 # build basic task (practice, 1-back, 2-back)
 # Decide to use animals for small children and other for adolecsents.
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 30 11:01:15 2015
-
-@author: orduek
-Corsi Block Expreiment in Psychopy.
-This experiment is spatial memory experiment as in the WMS
-"""
 
 from psychopy import core, visual, gui, data, misc, event, sound
 import time, os, random
@@ -57,13 +50,13 @@ mywin = visual.Window(fullscr=True,monitor="testMonitor",allowGUI=False,color="W
 # make stimuli list
 animalList=['1.bmp','2.bmp','3.bmp','4.bmp','5.bmp','6.bmp','7.bmp','8.bmp','9.bmp','10.bmp']
 
-fixation = visual.GratingStim(mywin, color=-1, colorSpace='rgb', tex=None, mask='circle',size=0.01)
-targetImage=visual.ImageStim(mywin,image=animalList[1],units='deg',pos=(0,0),size=6)
-distractorImage1=visual.ImageStim(mywin,image=animalList[2],units='deg',pos=(0,0),size=6)
-distractorImage2=visual.ImageStim(mywin,image=animalList[3],units='deg',pos=(0,0),size=6)
+fixation = visual.TextStim(mywin, text='+',color="Black")
+targetImage=visual.ImageStim(mywin,image=animalList[1],units='deg',pos=(0,0),size=10)
+distractorImage1=visual.ImageStim(mywin,image=animalList[2],units='deg',pos=(0,0),size=10)
+distractorImage2=visual.ImageStim(mywin,image=animalList[3],units='deg',pos=(0,0),size=10)
 thanks=visual.ImageStim(mywin,image='thanks.png',units='deg',pos=(0,0),size=8)
 contin=visual.ImageStim(mywin,image='continue.png',units='deg',pos=(0,0))
-correctMsg=visual.TextStim(mywin, text="Right", color="green")
+correctMsg=visual.ImageStim(mywin, image="smiley.jpeg",units='deg',pos=(0,0),size=10)
 incorrectMsg=visual.TextStim(mywin, text="Wrong", color="Red")
 slideOne=visual.ImageStim(mywin, image='slide1.png',units='deg',pos=(0,0),size=20)
 secondBlock=visual.ImageStim(mywin, image='secondBlock.png',units='deg',pos=(0,0),size=20)
@@ -72,31 +65,35 @@ slideTwo=visual.ImageStim(mywin, image='endPractice.png',units='deg',pos=(0,0),s
 # interstimulus interval of 1000ms
 
 # two block loads (1-back, 2-back)
-# 25 trials per block
+# 30 trials per block
 # first three of each block are not targets
-# 33% of remaining (7) are targets.
+# 30% of remaining (10) are targets.
 
 # building list of trials for block
 # list containing distractor or target (7 targets, 18 distractors. first three must be distractors)
 distList=['distractor'] *3 # first two (the first will be set)
-targetList=['distractor'] *15 + ['target'] *7 # list of 7 targets and 15 distractors
+targetList=['distractor'] *17 + ['target'] *10 # list of 7 targets and 15 distractors
 random.shuffle(targetList)
 trialList=distList+targetList # full list
 img=random.sample(animalList,1)
 runList=[img]  # list that will be filled with pictures so I can go back 1,2 or more if needed
 trialNo=0
 stimExp = 1.5 #1500ms exposure of stimulus
-
+#nMistakes=  # number of mistakes to stop experiment
 
 def runBlock(n,block, targetList,distList): # take a target and distractor list to use same functions to practice trials
+    countAnswer=0
     global trialNo
     trialNo=trialNo
-    random.shuffle(targetList) # shuffle just the last 22
+    random.shuffle(targetList) # shuffle just the last 27
     trialList=distList+targetList # combine the first 3 distractors with last 22
     for i in trialList:
         trialCond=i
-        trialClock=core.Clock()
         trialNo=trialNo+1
+        fixation.draw()
+        mywin.flip()
+        core.wait(1)
+        trialClock=core.Clock()
         if i=='distractor':
             distImg=random.sample(animalList,1)
             while distImg[0]==runList[len(runList)-n]:
@@ -111,9 +108,11 @@ def runBlock(n,block, targetList,distList): # take a target and distractor list 
                 response=0
                 answer=1
                 rt=core.Clock.getTime(trialClock)
-                correctMsg.draw()
-                mywin.flip()
-                core.wait(1)
+                if block==0:
+                    correctMsg.draw()
+                    mywin.flip()
+                    core.wait(1)
+
 
             else:
                 response=1
@@ -122,10 +121,12 @@ def runBlock(n,block, targetList,distList): # take a target and distractor list 
                         core.quit()
                     elif thisKey=='space':
                         answer=0
+                        countAnswer=countAnswer+1 # counting mistakes
                         rt=core.Clock.getTime(trialClock)
-                        incorrectMsg.draw()
-                        mywin.flip()
-                        core.wait(1)
+
+                    #    incorrectMsg.draw()
+                    #    mywin.flip()
+                    #    core.wait(1)
 
             #mywin.flip()
         #    core.wait(1)
@@ -142,10 +143,11 @@ def runBlock(n,block, targetList,distList): # take a target and distractor list 
             if allKeys==None:
                 response=0
                 answer=0
+                countAnswer=countAnswer+1 # counting mistakes
                 rt=core.Clock.getTime(trialClock)
-                incorrectMsg.draw()
-                mywin.flip()
-                core.wait(1)
+            #    incorrectMsg.draw()
+            #    mywin.flip()
+            #    core.wait(1)
 
             else:
                 response=1
@@ -155,15 +157,18 @@ def runBlock(n,block, targetList,distList): # take a target and distractor list 
                     elif thisKey=='space':
                         answer=1
                         rt=core.Clock.getTime(trialClock)
-                        correctMsg.draw()
-                        mywin.flip()
-                        core.wait(1)
+                        if block==0:
+                            correctMsg.draw()
+                            mywin.flip()
+                            core.wait(1)
+
 
         #    mywin.flip()
         #    core.wait(1)
             #save to file (trialNo,condition,image,press,RT,correct/incorrect)
         event.clearEvents()
         dataFile.write('%i,%i,%s,%f,%i,%i,%s\n' %(trialNo,block,trialCond,rt,response,answer,stimulus))
+    return countAnswer
 
 
 # Instructions slide 1
@@ -188,10 +193,16 @@ while endP==0:
             endP==0
 
 # 1-back block
-runBlock(1,1,targetList,distList)
+countAnswer = runBlock(1,1,targetList,distList)
 contin.draw()
 mywin.flip()
 
+if countAnswer>22: # amount of mistakes that prevent moving to next block
+    thanks.draw()
+    mywin.flip()
+    core.wait(2)
+    dataFile.close()
+    core.quit()
 
 # Instructions slide 1
 secondBlock.draw()
