@@ -31,10 +31,15 @@ if not os.path.exists('results'):
 
 fileName = 'ant' + expInfo['subject no'] + expInfo['dateStr']
 dataFile = open(directory+'/results/'+fileName+'.csv', 'w')#a simple text file with 'comma-separated-values'
-dataFile.write('trialNo,block,cue,direction,imagePos,congruency,correctAns,answer,rt,image\n')
+dataFile.write('trialNo,block,cue,direction,imagePos,congruency,correctAns,answer,rt,image,fixationLength\n')
 
-stimListCong=['fish_lll.bmp','fish_rrr.bmp']
-stimListInCong=['fish_lrl.bmp','fish_rlr.bmp']
+stimRcong='fish_rrr.bmp'
+stimRinCong='fish_lrl.bmp'
+stimLcong="fish_lll.bmp"
+stimLinCong='fish_rlr.bmp'
+
+stimListCong=[stimLcong,stimRcong]
+stimListInCong=[stimRinCong,stimRinCong]
 
 #Open window
 mywin = visual.Window(fullscr=True,monitor="testMonitor",allowGUI=False,color="Cyan")
@@ -83,7 +88,8 @@ def runBlock(block,blockList,stimListCong,stimListInCong,spatialList,posList):
         trialNo=trialNo+1
         fixation.draw()
         mywin.flip()
-        core.wait(random.uniform(0.4,1.6))
+        fixationLength=random.uniform(0.4,1.6)
+        core.wait(fixationLength)
         stim=0
         if (i=='cong_no') or (i=='incong_no'): # congruent no Cue
             cue='NoCue'
@@ -162,6 +168,7 @@ def runBlock(block,blockList,stimListCong,stimListInCong,spatialList,posList):
         allKeys=event.waitKeys(maxWait=1.7,keyList=['q','p','escape'])
         if allKeys==None: # if no key was presses
             answer='None'
+            correctAns=5
             rt=core.Clock.getTime(trialClock)
         else:
             for thisKey in allKeys:
@@ -173,7 +180,7 @@ def runBlock(block,blockList,stimListCong,stimListInCong,spatialList,posList):
                 elif thisKey=='p':
                     answer='p'
                     rt=core.Clock.getTime(trialClock)
-        if (fishImage=='fish_lll.bmp') or (fishImage=='fish_rlr.bmp'):
+        if (fishImage==stimLcong) or (fishImage==stimLinCong):
             direction='left'
             if answer=='p':
                 correctAns=0
@@ -193,7 +200,7 @@ def runBlock(block,blockList,stimListCong,stimListInCong,spatialList,posList):
         core.wait(1)
         event.clearEvents()
         image=fishImage
-        dataFile.write('%i,%i,%s,%s,%s,%s,%i,%s,%f,%s\n' %(trialNo,block,cue,direction,imagePos,congruency,correctAns,answer,rt,image))
+        dataFile.write('%i,%i,%s,%s,%s,%s,%i,%s,%f,%s,%f\n' %(trialNo,block,cue,direction,imagePos,congruency,correctAns,answer,rt,image,fixationLength))
 
 # start with instructions
 instMsg=visual.TextStim(mywin, text="Welcome.\nYou need to feed the fish. So when the fish looks left you need to give the food to the left. When looks right, you need to feed to the right", color="Black")
@@ -283,6 +290,7 @@ instMsg.draw()
 mywin.flip()
 event.waitKeys()
 # Now start practice trials (in a while loop so we can go back to it until ready)
+
 endP=0 # set practice loop
 while endP==0:
     # training block - 16 samples
@@ -312,3 +320,43 @@ stimListInCong=stimListInCong*8
 spatialList=[cueStimUp,cueStimDown] *4
 posListPractice=posList * 12 # 24 trials without spatial cue
 runBlock(1,blockList,stimListCong,stimListInCong,spatialList,posListPractice)
+
+instMsg.text="You did a great job\nNow we need to help out and feed the mice.\npress any key when ready"
+instMsg.draw()
+mywin.flip()
+event.waitKeys()
+
+# start second block. Now with mice.
+stimRcong='mouse_rrr.bmp'
+stimRinCong="mouse_lrl.bmp"
+stimLcong='mouse_lll.bmp'
+stimLinCong='mouse_rlr.bmp'
+stimListCong=[stimRcong,stimLcong]
+stimListInCong=[stimRinCong,stimLinCong]
+blockList=congList *4 + incongList*4
+stimListCong=stimListCong*8
+stimListInCong=stimListInCong*8
+spatialList=[cueStimUp,cueStimDown] *4
+posListPractice=posList * 12 # 24 trials without spatial cue
+mywin.setColor('#ff8080')
+runBlock(2,blockList,stimListCong,stimListInCong,spatialList,posListPractice)
+
+instMsg.text="You did a great job\nNow we need to help out and feed the birds.\npress any key when ready"
+instMsg.draw()
+mywin.flip()
+event.waitKeys()
+
+# start second block. Now with mice.
+stimRcong='bird_rrr.bmp'
+stimRinCong="bird_lrl.bmp"
+stimLcong='bird_lll.bmp'
+stimLinCong='bird_rlr.bmp'
+stimListCong=[stimRcong,stimLcong]
+stimListInCong=[stimRinCong,stimLinCong]
+blockList=congList *4 + incongList*4
+stimListCong=stimListCong*8
+stimListInCong=stimListInCong*8
+spatialList=[cueStimUp,cueStimDown] *4
+posListPractice=posList * 12 # 24 trials without spatial cue
+mywin.setColor('#00ff00')
+runBlock(3,blockList,stimListCong,stimListInCong,spatialList,posListPractice)
