@@ -8,16 +8,23 @@
     <script src="jspsych-4.3/plugins/jspsych-single-stim.js"></script>
     <script src="jspsych-4.3/plugins/jspsych-categorize.js"></script>
     <link href="jspsych-4.3/css/jspsych.css" rel="stylesheet" type="text/css"></link>
-    <style>
-    div#myDIV {
-    position:fixed;
-    width:100px;
-    height:100px;
-    background:red;
-    left:300px;
-    top:100px;
-}
-    </style>
+    <style type="text/css">
+      .under
+      {
+      position:absolute;
+      left:100px;
+      top:100px;
+      z-index:-1;
+      }
+      .over
+      {
+      position:absolute;
+      left:140px;
+      top:110px;
+      z-index:-1;
+      }
+      </style>
+
   </head>
   <body>
 
@@ -119,7 +126,7 @@ var fixation_trial = {
     key_answer:all_trials.answer[i],
     timing_stim: stimExp,
     choices: ['space'],
-    correct_text: "<div class='left bottom-content' z-element=-1><img src='static/images/applebasket.png'></img><img src='static/images/redapple.jpg'></img>",
+    correct_text: "<div class='under'><img src='static/images/applebasket.png'></img><div class='over'><img src='static/images/redapple.jpg'></img>",
     show_stim_with_feedback: false,
     incorrect_text:" ",
     timeout_message:" ",
@@ -172,9 +179,10 @@ experiment.push(debrief_block);
 jsPsych.init({
   //experiment_structure: experiment,
   experiment_structure: timeline,
-  on_finish: function(data){ saveData("filename.csv", jsPsych.data.dataAsCSV()) }
-/*  function() {
-        jsPsych.data.displayData();} */
+  show_progress_bar: true,
+  on_finish: function() { jsPsych.data.displayData(); }
+  /*function(data){ saveData("filename.csv", jsPsych.data.dataAsCSV()) }
+/*  ;} */
 });
 
 </script>
